@@ -33,6 +33,8 @@
 		// setup we need to do all of the ususal operations.
 		var Word = $resource("/words/:id", {id: '@id'}, {});
 
+		$scope.words=" MESSAGE: Please digit a number into the entry field to find the associated words"
+
 		$scope.list = function(idx){
 			// Notice calls to Words are often given callbacks.
 			Word.query(function(data){
@@ -66,7 +68,7 @@
 			);
 		};
 
-		$scope.list();
+		//$scope.list();
 
 		$scope.master = {};
 
