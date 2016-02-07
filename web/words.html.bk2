@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en" ng-app="myapp">
+<head>
+	<meta charset="UTF-8">
+	<title>My mnemo words</title>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootswatch/3.1.0/cyborg/bootstrap.min.css">
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+</head>
+<!-- putting this at the top to remove the jarring load -->
+<script src="http://code.angularjs.org/1.2.10/angular.min.js"></script>
+<body ng-controller="MainController">
+	<div class="jumbotron">
+		<button class="btn btn-primary pull-right" ng-click="add()">
+			<i class="fa fa-plus"></i> Add Word
+		</button>
+		<form novalidate class="simple-form">
+    		Mnemo Code: <input type="number" ng-model="params.id" /><br />
+    		E-mail: <input type="email" ng-model="user.email" /><br />
+    		Gender: <input type="radio" ng-model="user.gender" value="male" />male
+    		<input type="radio" ng-model="user.gender" value="female" />female<br />
+    		<input type="button" ng-click="reset()" value="Reset" />
+    		<input type="submit" ng-click="getWordList(params.id)" value="Get" />
+  		</form>
+  		<pre>user = {{user | json}}</pre>
+  		<pre>master = {{master | json}}</pre>
+		
+		<h1>My word list</h1>
+	</div>
+	<div class="container-fluid">
+		<h3>Words</h3>
+		<div class="well">
+					 <ng-class="{active: b.word == selected.word}" ng-repeat="b in words">
+		</div>
+	</div>
+<script src="http://code.angularjs.org/1.2.10/angular-resource.min.js"></script>
+<script>
+	// new dependency: ngResource is included just above
+	var myapp = new angular.module("myapp", ["ngResource"]);
+
+	// inject the $resource dependency here
+	myapp.controller("MainController", ["$scope", "$resource", function($scope, $resource){
+		
+		// I designed the backend to play nicely with angularjs so this is all the
+		// setup we need to do all of the ususal operations.
+		var Word = $resource("/words/:id", {id: '@id'}, {});
+
+		$scope.params = {
+			  id: 0
+		};
+
+		$scope.selected = null;
+
+		$scope.list = function(idx){
+			// Notice calls to Words are often given callbacks.
+			Word.query(function(data){
+				$scope.words = data;
+				if(idx != undefined) {
+					$scope.selected = $scope.words[idx];
+					$scope.selected.idx = idx;
+				}
+				console.log('words--',$scope.words)
+			}, function(error){
+				alert(error.data);
+			});
+		};
+
+		$scope.getWordList = function(idx){
+			// Notice calls to Words are often given callbacks.
+			console.log('entrato in getWordList',$scope.idx)
+			Word.query(function(data){
+				$scope.words = data;
+			}, function(error){
+				alert(error.data);
+			});
+		};
+
+		$scope.list();
+
+		$scope.master = {};
+
+        $scope.reset = function() {
+              $scope.user = angular.copy($scope.master);
+              };
+
+      $scope.reset();
+
+	}]);
+</script>
+</body>
+</html>
